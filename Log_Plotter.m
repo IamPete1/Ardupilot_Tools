@@ -614,26 +614,24 @@ function Load_file(~,~,file_name)
     plot_catagorys = getappdata(0,'plot_catagorys');
 
     % check for plot button avalablity
-    avalable = zeros(length(plots),1);
+   % avalable = zeros(length(plots),1);
     plot_names = cell(length(plots),1);
     for n = 1:length(plots)
-        i = 5; 
-        while i < length(plots{n})
-            avalable(n) = or(avalable(n),~strcmp(PARM, get_var(plots{n}{i})));
-            i = i + 2;
-        end  
+        i = 1; 
+        while i <= (length(plots{n})-4)/2
+            avalable(n,i) = ~strcmp(PARM, get_var(plots{n}{3+(i*2)}));                  %#ok<AGROW>
+            i = i + 1;
+        end
         plot_names{n} = plots{n}{1};
     end 
     
     % any plot from each catogorcy can be avalable
     for n = 1:length(plot_catagorys)
         index = find(strcmp(plot_names,plot_catagorys{n}));
-        if any(avalable(index))
+        if any(any(avalable(index,:)))
              handles.(plots{index(1)}{1}).Enable = 'on';
         end
-    end
-    
-    
+    end  
     
 end
 

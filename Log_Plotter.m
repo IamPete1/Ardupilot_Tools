@@ -1,6 +1,6 @@
 function Log_Plotter ()
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Setup 
+% Setup
 clc
 clear
 close all
@@ -25,7 +25,7 @@ plots{12}= {'copter_rate','Copter Rates','Yaw Rate - Desired vs actual','Angle (
 plots{13}= {'RC_contorl_in','Control in','Control inputst','PWM','AETR',[3,4,5,6,7]};
 plots{14}= {'Speed','Speed','Speed (m/s)','GPS',11,'CTUN',10};
 
-% Defualts 
+% Defualts
 file_name = 'Input File Name';
 print_messages_default = 1;
 save_param_file_default = 1;
@@ -53,9 +53,9 @@ open_param_file_default = 0;
 %plot_log('PWM Out','PWM',{RCOU,RCOU_label},[10])%,4,5,6,7])
 
 %plot_log('Control outputs','',{AETR,AETR_label},[3,4,5,6,7])
-%plot_log('Aileron','',{AETR,AETR_label},[3]) 
-%plot_log('Throttle','',{AETR,AETR_label},[5]) 
-%plot_log('Pitch','',{AETR,AETR_label},[4]) 
+%plot_log('Aileron','',{AETR,AETR_label},[3])
+%plot_log('Throttle','',{AETR,AETR_label},[5])
+%plot_log('Pitch','',{AETR,AETR_label},[4])
 
 %plot_log('GPS','Ground Speed (m/s)',{GPS,GPS_label},11,{CTUN,CTUN_label},10)
 %plot_log('GPS','Ground Speed (m/s)',{GPS2,GPS2_label},11,{CTUN,CTUN_label},10)
@@ -128,6 +128,8 @@ file_name = '10.mat';
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Simple(ish) GIU
 load_in = @(src,event)Load_file(src,event,file_name);
+
+handles.figure = figure;
 
 handles.print_messages = uicontrol('Style',...
     'radiobutton',...
@@ -210,9 +212,24 @@ for n = 1:length(index)
         'Position',[X(n)+10 Y(n)+200 100 30],...
         'Enable','off',...
         'Value',1,...
-        'HandleVisibility','off');    
+        'HandleVisibility','off');
 end
 
+handles.plot = uicontrol('Style',...
+    'pushbutton',...
+    'String','Plot',...
+    'Position',[200 10 100 30],...
+    'Enable','off',...
+    'HandleVisibility','off',...
+    'Callback', @plot_figures);
+
+handles.plot_close = uicontrol('Style',...
+    'pushbutton',...
+    'String','Close Plots',...
+    'Position',[100 10 100 30],...
+    'Enable','off',...
+    'HandleVisibility','off',...
+    'Callback', @plot_close);
 
 setappdata(0,'handles', handles);
 setappdata(0,'plots', plots);
@@ -226,42 +243,12 @@ return
 
 global Mode_markes
 global TimeMark
-global colour 
+global colour
 global MODELOOKUP
 global Time_markers
 global TimeCrop
 
-colour = ['b','r','m','g','k','c','b','r','m','g','k','c','b','r','m','g','k','c','b','r','m','g','k','c','b','r','m','g','k','c','b','r','m','g','k','c','b','r','m','g','k','c','b','r','m','g','k','c','b','r','m','g','k','c'];
-% Mdes for plane
-%MODELOOKUP = {'Manual','CIRCLE','STABILIZE','TRAINING','ACRO','FBWA','FBWB','CRUISE','AUTOTUNE','','Auto','RTL','Loiter','','AVOID_ADSB','Guided','','QSTABILIZE','QHOVER','QLOITER','QLAND','QRTL'};
-% Mode for copter
-MODELOOKUP = {'Stabilize','Acro','AltHold','Auto','Guided','Loiter','RTL','Circle','Land','Drift','Sport','Flip','AutoTune','PosHold','Brake','Throw','Avoid_ADSB','Guided_NoGPS','Smart_RTL','FlowHold','Follow'};
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Config 
-%load('BRONCO4')
-%load('big')
-%load('crash1')
-%load('1_4')
-%load('crash2')
-%load('34')
-%load('Chalange')
-
-%load('Tricopter')
-
-%load('Sail2')
-%load('motor_out')
-%load('8')
-%load('Hex test 2.0.mat')
-%load('Hex no props10.mat')
-%load('1')
-%load('motortest5')
-%load('4')
-%load('flying1')
-%load('10')
-%load('HEX autotune 3')
-file_name = '2019-01-08 09-41-27';
-log = load_log(file_name);
 
 
 TimeMark = [2213,2215];%(s) %Time Markers (vert lines)
@@ -274,7 +261,7 @@ TimeCrop = [0,nan]; % (s) Time to crop to
 Time_markers = false;
 Mode_markes = true;
 
-% Param compare 
+% Param compare
 if 0
     clearvars -except PARM
     PRAM2 = load('new','PARM');
@@ -300,11 +287,11 @@ if 0
         elseif strfind(PARM{n,1},'FS_')
         %elseif strfind(PARM{n,1},'Q_')
 
-        elseif isnan(index) 
-            fprintf('%s, Does not exist!!\n',PARM{n,1});     
+        elseif isnan(index)
+            fprintf('%s, Does not exist!!\n',PARM{n,1});
         elseif PARM{n,2} ~= PRAM2.PARM{index,2}
             fprintf('%s, %g, %g\n',PARM{n,1},PARM{n,2},PRAM2.PARM{index,2});
-        end            
+        end
         
     end
     return
@@ -313,134 +300,6 @@ end
 
 
 
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% plots 
-% Title, Ylabel, varable, colums ... varable, colums ... varable, colums
-
-%plot_log('Roll Angle - Desired vs actual','Angle (deg)',{ATT,ATT_label},[3,4])
-%plot_log('Roll Angle - Desired vs actual','Angle (deg)',{ATT,ATT_label},[-3,4])
-
-%plot_log('Pitch Angle - Desired vs actual','Angle (deg)',{ATT,ATT_label},[5,6])
-
-%plot_log('Pitch PID','',{PIDP,PIDP_label},[4,5,6])
-% do PID SUM
-%plot(PIDP(:,2)/1e6,PIDP(:,4)+PIDP(:,5)+PIDP(:,6))
-
-%plot_log('Roll PID','',{PIDR,PIDR_label},[4,5,6])
-% do PID SUM
-%plot(PIDR(:,2)/1e6,PIDR(:,4)+PIDR(:,5)+PIDR(:,6))
-
-
-%plot_log('CTUN Airspeed','',{CTUN,CTUN_label},[10])
-
-%plot_log('YAW Angle - Desired vs actual','Angle (deg)',{ATT,ATT_label},[7,8])
-
-%plot_log('Barometric Data','Altitude (m)',{BARO,BARO_label},3)%,{BARO2,BARO2_label},3)
-
-%plot_log('QTUN Data','Altitude (m)',{QTUN,QTUN_label},[5,6])
-
-%plot_log('Roll Rate - Desired vs actual','Angle (deg/s)',{RATE,RATE_label},[3,4,5])
-
-%plot_log('Pitch Rate - Desired vs actual','Angle (deg/s)',{RATE,RATE_label},[6,7,8])
-
-%plot_log('Yaw Rate - Desired vs actual','Angle (deg/s)',{RATE,RATE_label},[9,10,11])
-
-%plot_log('PWM Out','Angle (deg)',{RCOU,RCOU_label},[3,4],{RCIN,RCIN_label},[3,8])
-
-%plot_log('Big Throttle','PWM',{RCIN,RCIN_label},[3]) % 3 = throttle % 5 = pitch % roll = 4 % yaw = 6
-%plot_log('Big Pitch','PWM',{RCIN,RCIN_label},[5]) % 3 = throttle % 5 = pitch % roll = 4 % yaw = 6
-%plot_log('V Tail PWM Out','Angle (deg)',{RCOU,RCOU_label},[6,7])
-%plot_log('Ailerons PWM Out','Angle (deg)',{RCOU,RCOU_label},[3,10])
-
-%plot_log('Flaps in','PWM',{RCIN,RCIN_label},[7]) % 3 = throttle % 5 = pitch % roll = 4 % yaw = 6
-%plot_log('Flaps PWM Out','Angle (deg)',{RCOU,RCOU_label},[12,13])
-
-%plot_log('Yaw in','PWM',{RCIN,RCIN_label},[6]) % 3 = throttle % 5 = pitch % roll = 4 % yaw = 6
-%plot_log('Throttles PWM Out','Angle (deg)',{RCOU,RCOU_label},[8,9])
-%plot_log('PWM Out','PWM',{RCOU,RCOU_label},[6,7,8,9,10])%,4,5,6,7])
-%plot_log('PWM Out','PWM',{RCOU,RCOU_label},[6,9])%,4,5,6,7])
-%plot_log('PWM Out','PWM',{RCOU,RCOU_label},[7,8])%,4,5,6,7])
-%plot_log('PWM Out','PWM',{RCOU,RCOU_label},[10])%,4,5,6,7])
-
-%plot_log('Control outputs','',{AETR,AETR_label},[3,4,5,6,7])
-%plot_log('Aileron','',{AETR,AETR_label},[3]) 
-%plot_log('Throttle','',{AETR,AETR_label},[5]) 
-%plot_log('Pitch','',{AETR,AETR_label},[4]) 
-
-%plot_log('GPS','Ground Speed (m/s)',{GPS,GPS_label},11,{CTUN,CTUN_label},10)
-%plot_log('GPS','Ground Speed (m/s)',{GPS2,GPS2_label},11,{CTUN,CTUN_label},10)
-
-%plot_log('Pitch PID','',{PIQP,PIQP_label},[4,5,6])
-%plot(PIQP(:,2)/1e6,PIQP(:,4)+PIQP(:,5)+PIQP(:,6))
-
-%plot_log('Roll PID','',{PIQR,PIQR_label},[4,5,6])
-%plot(PIQR(:,2)/1e6,PIQR(:,4)+PIQR(:,5)+PIQR(:,6))
-
-%plot_log('Yaw PID','',{PIQY,PIQY_label},[4,5,6])
-%plot(PIQY(:,2)/1e6,PIQY(:,4)+PIQY(:,5)+PIQY(:,6))
-
-%plot_log('Angle of Attack','AoA (deg)',{AOA,AOA_label},3)
-
-%plot_log('Navigaiton',' ',{NTUN,NTUN_label},6)
-
-%plot_log('Bat Current','Current (A)',{BAT,BAT_label},5)
-
-%plot_log('Roll Rate','Rate',{RATE,RATE_label},[3,4])
-%plot_log('Pitch Rate','Rate',{RATE,RATE_label},[6,7])
-
-% HEX Motors
-%%{
-plot_log('HEX Motor PWM Out','PWM',{RCOU,RCOU_label},[3,4,5,6,7,8])%,4,5,6,7])
-
-plot_log('HEX Motor PWM Out','PWM',{RCOU,RCOU_label},[11,12,13,14,15,16])%,4,5,6,7])
-plot_log('Throttle in','PWM',{RCIN,RCIN_label},5)
-
-%plot_log('ESC Log','RPM',{ESC1,ESC1_label},3,{ESC2,ESC2_label},3,{ESC3,ESC3_label},3,{ESC4,ESC4_label},3,{ESC5,ESC5_label},3,{ESC6,ESC6_label},3)
-%plot_log('ESC Log','Voltage',{ESC1,ESC1_label},4,{ESC2,ESC2_label},4,{ESC3,ESC3_label},4,{ESC4,ESC4_label},4,{ESC5,ESC5_label},4,{ESC6,ESC6_label},4)
-%plot_log('ESC Log','Current (A)',{ESC1,ESC1_label},5,{ESC2,ESC2_label},5,{ESC3,ESC3_label},5,{ESC4,ESC4_label},5,{ESC5,ESC5_label},5,{ESC6,ESC6_label},5)
-%plot_log('ESC Log','TEMP (deg C)',{ESC1,ESC1_label},6,{ESC2,ESC2_label},6,{ESC3,ESC3_label},6,{ESC4,ESC4_label},6,{ESC5,ESC5_label},6,{ESC6,ESC6_label},6)
-
-plot_log('Current Draw','Current (A)',{BAT,BAT_label},5)
-
-plot_log('Roll Angle - Desired vs actual','Angle (deg)',{ATT,ATT_label},[3,4])
-plot_log('Pitch Angle - Desired vs actual','Angle (deg)',{ATT,ATT_label},[5,6])
-plot_log('Yaw Angle - Desired vs actual','Angle (deg)',{ATT,ATT_label},[7,8])
-
-plot_log('Roll Rate - Desired vs actual','Angle (deg/s)',{RATE,RATE_label},[3,4])
-plot_log('Pitch Rate - Desired vs actual','Angle (deg/s)',{RATE,RATE_label},[6,7])
-plot_log('Yaw Rate - Desired vs actual','Angle (deg/s)',{RATE,RATE_label},[9,10])
-
-%%}
-
-% Bi Copter
-%{
-plot_log('Roll Angle - Desired vs actual','Angle (deg)',{ATT,ATT_label},[3,4])
-plot_log('Pitch Angle - Desired vs actual','Angle (deg)',{ATT,ATT_label},[5,6])
-plot_log('Yaw Angle - Desired vs actual','Angle (deg)',{ATT,ATT_label},[7,8])
-
-plot_log('Roll Rate - Desired vs actual','Angle (deg/s)',{RATE,RATE_label},[3,4])
-plot_log('Pitch Rate - Desired vs actual','Angle (deg/s)',{RATE,RATE_label},[6,7])
-plot_log('Yaw Rate - Desired vs actual','Angle (deg/s)',{RATE,RATE_label},[9,10])
-
-plot_log('ESC Log','RPM',{ESC1,ESC1_label},3,{ESC2,ESC2_label},3)
-plot_log('ESC Log','Voltage',{ESC1,ESC1_label},4,{ESC2,ESC2_label},4)
-plot_log('ESC Log','Current (A)',{ESC1,ESC1_label},5,{ESC2,ESC2_label},5)
-plot_log('ESC Log','TEMP (deg C)',{ESC1,ESC1_label},6,{ESC2,ESC2_label},6)
-%}
-
-% UnderSlung Load 
-%{
-plot_log('Voltage ANC','Volts',{UNDL,UNDL_label},[3,4])
-fprintf('Roll - min %gv max %gv\n',min(UNDL(:,3)),max(UNDL(:,3)))
-fprintf('Roll - min %gv max %gv\n',min(UNDL(:,4)),max(UNDL(:,4)))
-
-plot_log('Load angle','Anlge (deg)',{UNDL,UNDL_label},[5,6])
-
-plot_log('Acelleration Offset','Acel (m/s^2)',{UNDL,UNDL_label},[7,8])
-%}
 
 
 % Caculaate P
@@ -480,24 +339,24 @@ for n = index1:index2
         fprintf('NaN Aspd @ t = %g s\n',ATT(n,2)/1e6)
     end
     
-    % Throttle scaling 
-    %{
+    % Throttle scaling
+%{
     if throttle > 0
         scalling = 0.5 + (trim_throttle / throttle / 2); % First order taylor expansion of square root
     else
-        scalling = 1.67;    
+        scalling = 1.67;
     end
     if scalling > 1.67
         scalling = 1.67;
     elseif scalling < 0.6
         scalling = 0.6;
     end
-    %}
+%}
     
     % Airspeed scailing
     scalling = scaleing_speed/airspd;
     
-    if scalling > 2 
+    if scalling > 2
         scalling = 2;
     elseif scalling < 0.5
         scalling = 0.5;
@@ -505,7 +364,7 @@ for n = index1:index2
     
     P_calc((n-index1)+1) = Roll_error * P_gain * scalling;
     P_calc2((n-index1)+1) = -R_max * P_gain * scalling;
-    sailing_calc((n-index1)+1) = scalling; 
+    sailing_calc((n-index1)+1) = scalling;
 end
 plot(ATT((index1:index2),2)/1e6,P_calc)
 plot(ATT((index1:index2),2)/1e6,P_calc2)
@@ -550,190 +409,279 @@ end
 
 % load in a log file
 function Load_file(~,~,file_name)
-    if isappdata(0,'file')
-        file_name_user = getappdata(0,'file');
-        if exist(file_name_user,'file')
-            file_name = file_name_user;            
-        end
+if isappdata(0,'file')
+    file_name_user = getappdata(0,'file');
+    if exist(file_name_user,'file')
+        file_name = file_name_user;
     end
-    
-    if ~exist(file_name,'file')    
-        fprintf('Could not find file: %s\n\n',file_name)
-        return
-    end   
-    
-    clc
-    logs = load_log(file_name);
-    setappdata(0,'logs',logs);
-    
-    handles = getappdata(0,'handles');
-    
-    % Print messages
-    if handles.print_messages.Value == 1
-        MSG1 = get_var('MSG1');
-        if strcmp(MSG1,'false')
-            fprintf('Could not find messages\n\n')
-        else
-            for n = 1:length(MSG1.value)
-                fprintf('%gs - %s\n',MSG1.value{1,n}{2}/1e6, MSG1.value{1,n}{3})
-            end
-            fprintf('\n')
-        end
-    end
-    
-    % save to  file
-    txt_file_name = [erase(file_name,'.mat'),'.param'];
-    if handles.save_param_file.Value == 1
-        PARM = get_var('PARM');        
-        if strcmp(PARM,'false')
-            fprintf('Could not find params\n\n')
-        else
-            fid = fopen(txt_file_name, 'w+');            
-            for n = 1:length(PARM.value)
-                fprintf(fid,'%16s\t%g\n',PARM.value{n,1},PARM.value{n,2});
-            end
-            fclose(fid);
-        end
-    end
-    
-    % open file 
-    if handles.open_param_file.Value == 1
-        if exist(txt_file_name,'file')
-            open(txt_file_name)
-        else
-            fprintf('Error, could not find pramiter file: %s\n\n',txt_file_name)
-        end
-    end
-    
-    % ungrey out relevent buttons
-    handles.mode_shadeing.Enable = 'on';
-    handles.time_markers.Enable = 'on';
-    handles.time_crop.Enable = 'on';
-    
-    plots = getappdata(0,'plots');
-    plot_catagorys = getappdata(0,'plot_catagorys');
+end
 
-    % check for plot button avalablity
-   % avalable = zeros(length(plots),1);
-    plot_names = cell(length(plots),1);
-    for n = 1:length(plots)
-        i = 1; 
-        while i <= (length(plots{n})-4)/2
-            avalable(n,i) = ~strcmp(PARM, get_var(plots{n}{3+(i*2)}));                  %#ok<AGROW>
-            i = i + 1;
+if ~exist(file_name,'file')
+    fprintf('Could not find file: %s\n\n',file_name)
+    return
+end
+
+clc
+logs = load_log(file_name);
+setappdata(0,'logs',logs);
+
+handles = getappdata(0,'handles');
+
+% Print messages
+MSG1 = get_var('MSG1');
+if strcmp(MSG1,'false') && handles.print_messages.Value == 1
+    fprintf('Could not find messages\n\n')
+else
+    for n = 1:length(MSG1.value)
+        message = MSG1.value{1,n}{3};
+        if handles.print_messages.Value == 1
+            fprintf('%gs - %s\n',MSG1.value{1,n}{2}/1e6, message)
         end
-        plot_names{n} = plots{n}{1};
-    end 
-    
-    % any plot from each catogorcy can be avalable
-    for n = 1:length(plot_catagorys)
-        index = find(strcmp(plot_names,plot_catagorys{n}));
-        if any(any(avalable(index,:)))
-             handles.(plots{index(1)}{1}).Enable = 'on';
+        % Try and spot if copter plane or rover and set window name
+        if contains(message,'Copter')
+            setappdata(0,'vehicle','Copter');
+            set(handles.figure,'Name',message,'NumberTitle','off')
+        elseif contains(message,'Plane')
+            setappdata(0,'vehicle','Plane');
+            set(handles.figure,'Name',message,'NumberTitle','off')            
+        elseif contains(message,'Rover')
+            setappdata(0,'vehicle','Rover');
+            set(handles.figure,'Name',message,'NumberTitle','off')            
         end
-    end  
-    
+    end
+    if handles.print_messages.Value == 1
+        fprintf('\n')
+    end
+end
+
+% save to  file
+txt_file_name = [erase(file_name,'.mat'),'.param'];
+if handles.save_param_file.Value == 1
+    PARM = get_var('PARM');
+    if strcmp(PARM,'false')
+        fprintf('Could not find params\n\n')
+    else
+        fid = fopen(txt_file_name, 'w+');
+        for n = 1:length(PARM.value)
+            fprintf(fid,'%16s\t%g\n',PARM.value{n,1},PARM.value{n,2});
+        end
+        fclose(fid);
+    end
+end
+
+% open file
+if handles.open_param_file.Value == 1
+    if exist(txt_file_name,'file')
+        open(txt_file_name)
+    else
+        fprintf('Error, could not find pramiter file: %s\n\n',txt_file_name)
+    end
+end
+
+% ungrey out relevent buttons
+handles.mode_shadeing.Enable = 'on';
+handles.time_markers.Enable = 'on';
+handles.time_crop.Enable = 'on';
+
+plots = getappdata(0,'plots');
+plot_catagorys = getappdata(0,'plot_catagorys');
+
+% check for plot button avalablity
+% avalable = zeros(length(plots),1);
+plot_names = cell(length(plots),1);
+for n = 1:length(plots)
+    i = 1;
+    while i <= (length(plots{n})-4)/2
+        avalable(n,i) = ~strcmp('false', get_var(plots{n}{3+(i*2)}));%#ok<AGROW>
+        i = i + 1;
+    end
+    plot_names{n} = plots{n}{1};
+end
+
+% any plot from each catogorcy can be avalable
+for n = 1:length(plot_catagorys)
+    index = find(strcmp(plot_names,plot_catagorys{n}));
+    if any(any(avalable(index,:)))
+        handles.(plots{index(1)}{1}).Enable = 'on';
+    end
+end
+
+if any(any(avalable))
+    handles.plot.Enable = 'on';
+end
+
+% Save avalibility array to save redoing
+setappdata(0,'avalable',avalable);
+
+end
+
+function plot_figures(~,~)
+plot_close();
+
+plots = getappdata(0,'plots');
+%plot_catagorys = getappdata(0,'plot_catagorys');
+handles = getappdata(0,'handles');
+avalable = getappdata(0,'avalable');
+
+% plot_log('ESC Log','TEMP (deg C)',{ESC1,ESC1_label},6,{ESC2,ESC2_label},6)
+
+
+% Plot all the selected plots 
+for n = 1:length(plots)
+    if any(avalable(n,:)) && handles.(plots{n}{1}).Value
+        plot_vars = [];
+        plot_vars{1} = plots{n}{3};
+        plot_vars{2} = plots{n}{4};
+        plot_vars{3} = plots{n}{2};
+        for i = 5:2:3+(sum(avalable(n,:))*2)
+           plot_vars{i-1} =  get_var({plots{n}{i}});
+           plot_vars{i} = plots{n}{i+1};
+        end
+        
+        for i = length(plot_vars):-1:4
+            if strcmp(plot_vars{i},'false')
+                plot_vars(i+1) = [];
+                plot_vars(i) = [];
+            end
+        end
+        
+        if length(plot_vars) ~= 3
+            plot_log(plot_vars{:})
+        else
+            fprintf('Could not find Data for plot: %s\n',plot_vars{1})
+        end
+    end
+end
+
+handles.plot_close.Enable = 'on';
+end
+
+function plot_close(~,~)
+% Close figs all except GUI window
+all_figs = findobj(0, 'type', 'figure');
+delete(setdiff(all_figs, 1));
+
+handles = getappdata(0,'handles');
+handles.plot_close.Enable = 'off';
 end
 
 % get data for a particular varable
 function variable = get_var(var_name)
-    logs = getappdata(0,'logs');
-    
-    for n = 1:length(logs)
-        if strcmp(logs{n,1},var_name)
-            index = n;
-            break;
-        end
-    end
-    
-    if exist('index','var')
-        variable.name = logs{index,1};
-        variable.label = logs{index,2};
-        variable.value = logs{index,3};
-    else
-        variable = 'false';
+logs = getappdata(0,'logs');
+
+for n = 1:length(logs)
+    if strcmp(logs{n,1},var_name)
+        index = n;
+        break;
     end
 end
 
-% Plot function 
-function plot_log(Title,Label,varargin)
-    global colour
-    global TimeMark
-    global Mode_markes
-    global MODE
-    global MODELOOKUP
-    global Time_markers
-    global TimeCrop
+if exist('index','var')
+    variable.name = logs{index,1};
+    variable.label = logs{index,2};
+    variable.value = logs{index,3};
+else
+    variable = 'false';
+end
+end
 
-    figure
-    hold all
-                
-    legend_val = {};
+% Plot function
+function plot_log(Title,Label,group,varargin)
+
+colour = ['b','r','m','g','k','c','b','r','m','g','k','c','b','r','m','g','k','c','b','r','m','g','k','c','b','r','m','g','k','c','b','r','m','g','k','c','b','r','m','g','k','c','b','r','m','g','k','c','b','r','m','g','k','c'];
+% Mdes for plane
+% Mode for copter
+
+vehicle = getappdata(0,'vehicle');
+if strcmp(vehicle,'Copter')
+    MODELOOKUP = {'Stabilize','Acro','AltHold','Auto','Guided','Loiter','RTL','Circle','Land','Drift','Sport','Flip','AutoTune','PosHold','Brake','Throw','Avoid_ADSB','Guided_NoGPS','Smart_RTL','FlowHold','Follow'};
+elseif strcmp(vehicle,'Plane')
+    MODELOOKUP = {'Manual','CIRCLE','STABILIZE','TRAINING','ACRO','FBWA','FBWB','CRUISE','AUTOTUNE','','Auto','RTL','Loiter','','AVOID_ADSB','Guided','','QSTABILIZE','QHOVER','QLOITER','QLAND','QRTL'};
+elseif  strcmp(vehicle,'Rover')
+    MODELOOKUP = {'Not Done this yet'};
+end
+
+figure('name',group,'NumberTitle','off')
+hold all
+
+legend_val = {};
+
+Min_max_x = [inf,-inf];
+Min_max_y = [inf,-inf];
+
+for n = 1:(length(varargin)/2)
+    var{1} = varargin{(n*2)-1}.value;
+    var{2} = varargin{(n*2)-1}.label;
+
+    var_index = varargin{(n*2)};
     
-    Min_max_x = [inf,-inf];     
-    Min_max_y = [inf,-inf];
-
-    for n = 1:(length(varargin)/2)
-        var = varargin{(n*2)-1};
-        var_index = varargin{(n*2)};
-                
-        for m = 1:length(var_index)     
-            if sign(var_index(m)) == 1
-                
-                plot(var{1}(:,2)/1e6,var{1}(:,var_index(m)),colour(var_index(m) + n - 1))
-                
-                legend_val(end+1) = var{2}(var_index(m));
-                
-                Min_max_x = [min([Min_max_x(1),min(var{1}(:,2)/1e6)]),max([Min_max_x(2),max(var{1}(:,2)/1e6)])];
-                Min_max_y = [min([Min_max_y(1),min(var{1}(:,var_index(m)))]),max([Min_max_y(2),max(var{1}(:,var_index(m)))])];
+    for m = 1:length(var_index)
+        if sign(var_index(m)) == 1
+            
+            plot(var{1}(:,2)/1e6,var{1}(:,var_index(m)),colour(var_index(m) + n - 1))
+            
+            legend_val(end+1) = var{2}(var_index(m));
+            
+            Min_max_x = [min([Min_max_x(1),min(var{1}(:,2)/1e6)]),max([Min_max_x(2),max(var{1}(:,2)/1e6)])];
+            Min_max_y = [min([Min_max_y(1),min(var{1}(:,var_index(m)))]),max([Min_max_y(2),max(var{1}(:,var_index(m)))])];
+        else
+            var_index(m) = abs(var_index(m));
+            
+            plot(var{1}(:,2)/1e6,-1 * var{1}(:,var_index(m)),colour(m))
+            
+            legend_val(end+1) = strcat('NEGATIVE ',var{2}(var_index(m)));
+            
+            Min_max_x = [min([Min_max_x(1),min(var{1}(:,2)/1e6)]),max([Min_max_x(2),max(var{1}(:,2)/1e6)])];
+            Min_max_y = [min([Min_max_y(1),-1*max(var{1}(:,var_index(m)))]),max([Min_max_y(2),-1*min(var{1}(:,var_index(m)))])];
+        end
+        
+        if any(isnan(var{1}(:,var_index(m))))
+            if min(isnan(var{1}(:,var_index(m))))
+                legend_val(end) = strcat(legend_val(end),'\color{red} Completely NAN!');
             else
-                var_index(m) = abs(var_index(m));
-                
-                plot(var{1}(:,2)/1e6,-1 * var{1}(:,var_index(m)),colour(m))
-                
-                legend_val(end+1) = strcat('NEGATIVE ',var{2}(var_index(m)));
-                
-                Min_max_x = [min([Min_max_x(1),min(var{1}(:,2)/1e6)]),max([Min_max_x(2),max(var{1}(:,2)/1e6)])];
-                Min_max_y = [min([Min_max_y(1),-1*max(var{1}(:,var_index(m)))]),max([Min_max_y(2),-1*min(var{1}(:,var_index(m)))])];
+                legend_val(end) = strcat(legend_val(end),'\color{red} Contains NAN!');
             end
-        end     
-     
-    end
-      
-    %--- Manual Time Markers ---
-    if ~isempty(TimeMark) && Time_markers == 1
-        for n = 1:length(TimeMark)
-            %Plotting Time Event Markers
-            plot([TimeMark(n),TimeMark(n)],Min_max_y,':g')
         end
+        
     end
     
-    %--- Mode Switch Markers ---
-    if Mode_markes
-        for n = 1:size(MODE,1)
-            %Plotting Time Event Markers
-            plot([MODE(n,2)/1e6,MODE(n,2)/1e6],Min_max_y,'-.k')
-            text((MODE(n,2)/1e6),Min_max_y(1)*0.9,MODELOOKUP{MODE(n,4)+1})
-        end
+end
+
+%{
+%--- Manual Time Markers ---
+if ~isempty(TimeMark) && Time_markers == 1
+    for n = 1:length(TimeMark)
+        %Plotting Time Event Markers
+        plot([TimeMark(n),TimeMark(n)],Min_max_y,':g')
     end
-      
-    xlabel('Time (s)')
-    
-    ylabel(Label)
-    title(Title)
-    legend(legend_val)
-    
-    if sum(isnan(TimeCrop)) == 2
-        xlim(Min_max_x)
-        ylim(Min_max_y)
-    elseif isnan(TimeCrop(1))
-        xlim([Min_max_x(1),TimeCrop(2)])
-    elseif isnan(TimeCrop(2))
-        xlim([TimeCrop(1),Min_max_x(2)])
-    else
-       xlim(TimeCrop)
+end
+
+%--- Mode Switch Markers ---
+if Mode_markes
+    for n = 1:size(MODE,1)
+        %Plotting Time Event Markers
+        plot([MODE(n,2)/1e6,MODE(n,2)/1e6],Min_max_y,'-.k')
+        text((MODE(n,2)/1e6),Min_max_y(1)*0.9,MODELOOKUP{MODE(n,4)+1})
     end
-    
+end
+%}
+xlabel('Time (s)')
+
+ylabel(Label)
+title(Title)
+legend(legend_val)
+%{
+if sum(isnan(TimeCrop)) == 2
+    xlim(Min_max_x)
+    ylim(Min_max_y)
+elseif isnan(TimeCrop(1))
+    xlim([Min_max_x(1),TimeCrop(2)])
+elseif isnan(TimeCrop(2))
+    xlim([TimeCrop(1),Min_max_x(2)])
+else
+    xlim(TimeCrop)
+end
+%}
 end
 
 % load in a log
@@ -741,14 +689,14 @@ function logs = load_log(file_name)
 
 load(file_name);
 
-vars = who; 
+vars = who;
 i = 1;
 for n = 1:length(vars)
     name = vars{n};
     
     % All varables posible must have _label
-    if endsWith(name, '_label')   
-        % some varables might have data aswell   
+    if endsWith(name, '_label')
+        % some varables might have data aswell
         name = erase(name,'_label');
         if any(strcmp(vars,name))
             logs{i,1} = name;

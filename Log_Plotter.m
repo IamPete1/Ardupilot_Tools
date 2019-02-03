@@ -31,7 +31,7 @@ plots{11}= {'copter_rate','Copter Rates','Pitch Rate - Desired vs actual','Angle
 plots{12}= {'copter_rate','Copter Rates','Yaw Rate - Desired vs actual','Angle (deg/s)','RATE',[9,10,11]};
 plots{13}= {'RC_contorl_in','Control in','Control inputst','PWM','AETR',[3,4,5,6,7]};
 plots{14}= {'Speed','Speed','Speed (m/s)','GPS',11,'GPS2',11,'CTUN',10};
-plots{15}= {'PWM_Out','PWM Out','PWM Out','PWM','RCOU',[3,4,5,4,6,7,8]};
+plots{15}= {'PWM_Out','PWM Out','PWM Out','PWM','RCOU',[3,4,5,4,6,7,8,9,10]};
 plots{16}= {'Control_outputs','Control out','Control outputs','','AETR',[3,4,5,6,7]};
 plots{17}= {'Quadplane_PID','Quadplane PID','Quadplane Pitch PID','','PIQP',[4,5,6]};
 plots{18}= {'Quadplane_PID','Quadplane PID','Quadplane Roll PID','','PIQR',[4,5,6]};
@@ -42,10 +42,11 @@ plots{22}= {'Bat','Battery','Battery Volts','Voltage','BAT',4};
 plots{23}= {'Bat','Battery','Battery Current','Current (A)','BAT',5};
 plots{24}= {'rate','Rates','Roll Rate','rate deg/s^2','RATE',[3,4]};
 plots{25}= {'rate','Rates','Pitch Rate','rate deg/s^2','RATE',[6,7]};
-plots{26}= {'ESC_Log','ESC Log','ESC RPM','RPM','ESC1',3,'ESC2',3,'ESC3',3,'ESC4',3,'ESC5',3,'ESC6',3,'ESC7',3,'ESC8',3};
-plots{27}= {'ESC_Log','ESC Log','ESC Voltage','Voltage','ESC1',4,'ESC2',4,'ESC3',4,'ESC4',4,'ESC5',4,'ESC6',4,'ESC7',4,'ESC8',4};
-plots{28}= {'ESC_Log','ESC Log','ESC Current','Current (A)','ESC1',5,'ESC2',5,'ESC3',5,'ESC4',5,'ESC5',5,'ESC6',5,'ESC7',5,'ESC8',5};
-plots{29}= {'ESC_Log','ESC Log','ESC Tmep','Temp (deg C)','ESC1',6,'ESC2',6,'ESC3',6,'ESC4',6,'ESC5',6,'ESC6',6,'ESC7',6,'ESC8',6};
+plots{26}= {'rate','Rates','Yaw Rate','rate deg/s^2','RATE',[9,10]};
+plots{27}= {'ESC_Log','ESC Log','ESC RPM','RPM','ESC1',3,'ESC2',3,'ESC3',3,'ESC4',3,'ESC5',3,'ESC6',3,'ESC7',3,'ESC8',3};
+plots{28}= {'ESC_Log','ESC Log','ESC Voltage','Voltage','ESC1',4,'ESC2',4,'ESC3',4,'ESC4',4,'ESC5',4,'ESC6',4,'ESC7',4,'ESC8',4};
+plots{29}= {'ESC_Log','ESC Log','ESC Current','Current (A)','ESC1',5,'ESC2',5,'ESC3',5,'ESC4',5,'ESC5',5,'ESC6',5,'ESC7',5,'ESC8',5};
+plots{30}= {'ESC_Log','ESC Log','ESC Tmep','Temp (deg C)','ESC1',6,'ESC2',6,'ESC3',6,'ESC4',6,'ESC5',6,'ESC6',6,'ESC7',6,'ESC8',6};
 
 
 % Defualts
@@ -527,16 +528,19 @@ for n = 1:(length(varargin)/2)
         
         if any(isnan(var{1}(:,var_index(m))))
             if min(isnan(var{1}(:,var_index(m))))
-                legend_val(end) = strcat(legend_val(end),'\color{red} Completely NAN!');
+                legend_val(m) = strcat(legend_val(m),'\color{red} Completely NAN!');
             else
-                legend_val(end) = strcat(legend_val(end),'\color{red} Contains NAN!');
+                legend_val(m) = strcat(legend_val(m),'\color{red} Contains NAN!');
             end
+        elseif all((var{1}(:,var_index(m))) == 0)
+            legend_val(m) = strcat(legend_val(m),'\color{red} all zero!');
         end
+        
         
     end
     
 end
-if any(isinf(Min_max_y))
+if any(isinf(Min_max_y)) || all(Min_max_y == 0)
     Min_max_y = [0,1];
 end
 

@@ -31,7 +31,7 @@ plots{11}= {'copter_rate','Copter Rates','Pitch Rate - Desired vs actual','Angle
 plots{12}= {'copter_rate','Copter Rates','Yaw Rate - Desired vs actual','Angle (deg/s)','RATE',[9,10,11]};
 plots{13}= {'RC_contorl_in','Control in','Control inputst','PWM','AETR',[3,4,5,6,7]};
 plots{14}= {'Speed','Speed','Speed (m/s)','GPS',11,'GPS2',11,'CTUN',10};
-plots{15}= {'PWM_Out','PWM Out','PWM Out','PWM','RCOU',[3,4,5,4,6,7,8,9,10]};
+plots{15}= {'PWM_Out','PWM Out','PWM Out','PWM','RCOU',[3,4,5,6,7,8,9,10]};
 plots{16}= {'Control_outputs','Control out','Control outputs','','AETR',[3,4,5,6,7]};
 plots{17}= {'Quadplane_PID','Quadplane PID','Quadplane Pitch PID','','PIQP',[4,5,6]};
 plots{18}= {'Quadplane_PID','Quadplane PID','Quadplane Roll PID','','PIQR',[4,5,6]};
@@ -47,6 +47,7 @@ plots{27}= {'ESC_Log','ESC Log','ESC RPM','RPM','ESC1',3,'ESC2',3,'ESC3',3,'ESC4
 plots{28}= {'ESC_Log','ESC Log','ESC Voltage','Voltage','ESC1',4,'ESC2',4,'ESC3',4,'ESC4',4,'ESC5',4,'ESC6',4,'ESC7',4,'ESC8',4};
 plots{29}= {'ESC_Log','ESC Log','ESC Current','Current (A)','ESC1',5,'ESC2',5,'ESC3',5,'ESC4',5,'ESC5',5,'ESC6',5,'ESC7',5,'ESC8',5};
 plots{30}= {'ESC_Log','ESC Log','ESC Tmep','Temp (deg C)','ESC1',6,'ESC2',6,'ESC3',6,'ESC4',6,'ESC5',6,'ESC6',6,'ESC7',6,'ESC8',6};
+plots{31}= {'RC_contorl_in','Control in2','Control inputst','RCIN','RCIN',[3,4,5,6,7,8,9,10,11,12,13,14,15,16]};
 
 
 % Defualts
@@ -330,7 +331,10 @@ else
             set(handles.figure,'Name',message,'NumberTitle','off')            
         elseif contains(message,'Rover')
             setappdata(0,'vehicle','Rover');
-            set(handles.figure,'Name',message,'NumberTitle','off')            
+            set(handles.figure,'Name',message,'NumberTitle','off')   
+        elseif contains(message,'AntennaTracker')
+            setappdata(0,'vehicle','AntennaTracker');
+            set(handles.figure,'Name',message,'NumberTitle','off')
         end
     end
     if handles.print_messages.Value == 1
@@ -483,6 +487,10 @@ elseif strcmp(vehicle,'Plane')
     MODELOOKUP = {'Manual','CIRCLE','STABILIZE','TRAINING','ACRO','FBWA','FBWB','CRUISE','AUTOTUNE','','Auto','RTL','Loiter','','AVOID_ADSB','Guided','','QSTABILIZE','QHOVER','QLOITER','QLAND','QRTL'};
 elseif  strcmp(vehicle,'Rover')
     MODELOOKUP = {'Not Done this yet'};
+elseif  strcmp(vehicle,'AntennaTracker')
+    MODELOOKUP = {'MANUAL','STOP','SCAN','SERVO TEST'};
+    MODELOOKUP{11} = 'AUTO';
+    MODELOOKUP{17} = 'INITIALISING';
 end
 
 fig_handle = figure('name',group,'NumberTitle','off');

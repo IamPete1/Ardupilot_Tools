@@ -392,18 +392,21 @@ if strcmp(MSG1,'false') && handles.print_messages.Value == 1
         end
     end
 else
+    i = 1;
     for n = 1:length(MSG1.value)
         message = MSG1.value{1,n}{3};
         if handles.print_messages.Value == 1
             time = MSG1.value{1,n}{2}/1e6;
-            i = 1;
-            while time > error_time(i)
-                if  exist('cprintf','file') == 2
-                    cprintf('red','%s',error_print{i})
-                else
-                    fprintf('%s',error_print{i})
+            
+            if exist('error_time','var')
+                while time > error_time(i)
+                    if  exist('cprintf','file') == 2
+                        cprintf('red','%s',error_print{i})
+                    else
+                        fprintf('%s',error_print{i})
+                    end
+                    i = i + 1;
                 end
-                i = i + 1;
             end
             fprintf('%gs - %s\n',time, message)
         end
@@ -424,11 +427,13 @@ else
     end
     
 end
-for n = i:length(error_time)
-    if  exist('cprintf','file') == 2
-        cprintf('red','%s',error_print{n})
-    else
-        fprintf('%s',error_print{n})
+if exist('error_time','var')
+    for n = i:length(error_time)
+        if  exist('cprintf','file') == 2
+            cprintf('red','%s',error_print{n})
+        else
+            fprintf('%s',error_print{n})
+        end
     end
 end
 if handles.print_messages.Value == 1

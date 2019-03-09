@@ -312,15 +312,100 @@ setappdata(0,'logs',logs);
 
 handles = getappdata(0,'handles');
 
+% Print any error's 
+ERR = get_var('ERR');
+errors = {'MAIN','RADIO','COMPASS','OPTFLOW','FAILSAFE RADIO','FAILSAFE BATT','FAILSAFE GPS','FAILSAFE GCS','FAILSAFE FENCE','FLIGHT MODE','GPS','CRASH CHECK','FLIP','AUTOTUNE','PARACHUTE','EKFCHECK','FAILSAFE EKFINAV','BARO','CPU','FAILSAFE ADSB','TERRAIN','NAVIGATION','FAILSAFE TERRAIN','EKF PRIMARY','THRUST LOSS CHECK'};
+sub_code = [4,    2,      NaN,      NaN,       3,               3,              3,             3,             3,              NaN,           12,   5,            6,    NaN       9,          10,        NaN,                11,   NaN,  3,              7,        8,           3,                 NaN,           NaN];
+
+% general error codes
+errors_sub{1+0,1} = 'ERROR RESOLVED';
+errors_sub{1+1,1} = 'FAILED TO INITIALISE';
+errors_sub{1+4,1} = 'UNHEALTHY';
+
+% radio
+errors_sub{1+2,2} = 'LATE FRAME';
+
+% failsafe_thr, batt, gps
+errors_sub{1+0,3} = 'FAILSAFE RESOLVED';
+errors_sub{1+1,3} = 'FAILSAFE OCCURRED';
+
+% main
+errors_sub{1+1,4}  = 'INS DELAY';
+
+% crash checker
+errors_sub{1+1,5}  = 'CRASH';
+errors_sub{1+2,5}  = 'LOSS OF CONTROL';
+
+% flip
+errors_sub{1+2,6}  = 'ABANDONED';
+
+% terrain
+errors_sub{1+2,7} = 'MISSING TERRAIN DATA';
+
+% navigation
+errors_sub{1+2,8} = 'FAILED TO SET DESTINATION';
+errors_sub{1+3,8} = 'RESTARTED RTL';
+errors_sub{1+4,8} = 'FAILED CIRCLE INIT';
+errors_sub{1+5,8} = 'DEST OUTSIDE FENCE';
+
+% parachute
+errors_sub{1+2,9} = 'TOO LOW';
+errors_sub{1+3,9} = 'LANDED';
+
+% EKF check definitions
+errors_sub{1+2,10} = 'BAD VARIANCE';
+errors_sub{1+0,10} = 'VARIANCE CLEARED';
+
+% Baro specific error codes
+errors_sub{1+2,11} = 'GLITCH';
+
+% GPS specific error coces
+errors_sub{1+2,12} = 'GLITCH';
+
+if ~strcmp(ERR,'false')
+    error_time = zeros(1,length(ERR.value));
+    error_print = cell(1,length(ERR.value));
+    for n = 1:length(ERR.value)
+        error_time(n) = ERR.value(n,2)/1e6;
+        message = errors(ERR.value(n,3));
+        index = sub_code(ERR.value(n,3));
+        index2 = ERR.value(n,4) + 1;
+        if isnan(index) || isempty(errors_sub{index,index2})
+            index = 1;
+        end
+        mesage_2 = errors_sub(index,index2);
+        error_print{n} = sprintf('%gs - %s %s\n',error_time(n), message{:},mesage_2{:});
+    end
+end
+
 % Print messages
 MSG1 = get_var('MSG1');
 if strcmp(MSG1,'false') && handles.print_messages.Value == 1
     fprintf('Could not find messages\n\n')
+    if exist('error_time','var')
+        for n = 1:length(error_time)
+            if  exist('cprintf','file') == 2
+                cprintf('red','%s',error_print{n})
+            else
+                fprintf('%s',error_print{n})
+            end
+        end
+    end
 else
     for n = 1:length(MSG1.value)
         message = MSG1.value{1,n}{3};
         if handles.print_messages.Value == 1
-            fprintf('%gs - %s\n',MSG1.value{1,n}{2}/1e6, message)
+            time = MSG1.value{1,n}{2}/1e6;
+            i = 1;
+            while time > error_time(i)
+                if  exist('cprintf','file') == 2
+                    cprintf('red','%s',error_print{i})
+                else
+                    fprintf('%s',error_print{i})
+                end
+                i = i + 1;
+            end
+            fprintf('%gs - %s\n',time, message)
         end
         % Try and spot if copter plane or rover and set window name
         if contains(message,'Copter')
@@ -337,9 +422,17 @@ else
             set(handles.figure,'Name',message,'NumberTitle','off')
         end
     end
-    if handles.print_messages.Value == 1
-        fprintf('\n')
+    
+end
+for n = i:length(error_time)
+    if  exist('cprintf','file') == 2
+        cprintf('red','%s',error_print{n})
+    else
+        fprintf('%s',error_print{n})
     end
+end
+if handles.print_messages.Value == 1
+    fprintf('\n')
 end
 
 % save to  file
@@ -422,7 +515,7 @@ for n = 1:length(plots)
         plot_vars{2} = plots{n}{4};
         plot_vars{3} = plots{n}{2};
         for i = 5:2:3+(sum(avalable(n,:))*2)
-           plot_vars{i-1} =  get_var({plots{n}{i}}); %#ok<CCAT1>
+           plot_vars{i-1} =  get_var({plots{n}{i}});
            plot_vars{i} = plots{n}{i+1};
         end
         

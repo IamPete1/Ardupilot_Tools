@@ -20,22 +20,29 @@ end
 plots{1} = {'att','Attitude','Roll Angle - Desired vs actual','Angle (deg)','ATT',[3,4]};
 plots{2} = {'att','Attitude','Pitch Angle - Desired vs actual','Angle (deg)','ATT',[5,6]};
 plots{3} = {'att','Attitude','Yaw Angle - Desired vs actual','Angle (deg)','ATT',[7,8]};
-plots{4} = {'copter_PID','Copter PID','Pitch PID','','PIDP',[4,5,6]};
-plots{5} = {'copter_PID','Copter PID','Roll PID','','PIDR',[4,5,6]};
-plots{6} = {'copter_PID','Copter PID','Yaw PID','','PIDY',[4,5,6]};
+plots{4} = {'copter_PID','Copter PID','Pitch PID','','PIDP',[5,6,7,8]};%,'RATE',[3,4]};
+plots{5} = {'copter_PID','Copter PID','Roll PID','','PIDR',[5,6,7,8]};%,'RATE',[6,7]};
+plots{6} = {'copter_PID','Copter PID','Yaw PID','','PIDY',[5,6,7,8]};%,'RATE',[9,10]};
 plots{7} = {'Airspeed','Airspeed','Airspeed','m/s','CTUN',10};
 plots{8} = {'Baro','Barometic Alt','Barometic Alt','Altitude (m)','BARO',3,'BARO2',3};
 plots{9} = {'Quadplane_alr','Q Altitude','Q Altitude','QTUN',[5,6]};
 plots{10}= {'copter_rate','Copter Rates','Roll Rate - Desired vs actual','Angle (deg/s)','RATE',[3,4,5]};
 plots{11}= {'copter_rate','Copter Rates','Pitch Rate - Desired vs actual','Angle (deg/s)','RATE',[6,7,8]};
 plots{12}= {'copter_rate','Copter Rates','Yaw Rate - Desired vs actual','Angle (deg/s)','RATE',[9,10,11]};
-plots{13}= {'RC_contorl_in','Control in','Control inputst','PWM','AETR',[3,4,5,6,7]};
+plots{13}= {'RC_contorl_in','Control in','Control inputs','PWM','AETR',[3,4,5,6]};
+%plots{13}= {'RC_contorl_in','Control in','Control inputs','PWM','AETR',[5]};
+
 plots{14}= {'Speed','Speed','Speed (m/s)','GPS',11,'GPS2',11,'CTUN',10};
-plots{15}= {'PWM_Out','PWM Out','PWM Out','PWM','RCOU',[3,4,5,6,7,8,9,10]};
+plots{15}= {'PWM_Out','PWM Out','PWM Out','PWM','RCOU',[3,4,5,6,7,8,9,10,11,12,13,14,15,16]};
+%plots{15}= {'PWM_Out','PWM Out','PWM Out','PWM','RCOU',[3,4]};
+%plots{15}= {'PWM_Out','PWM Out','PWM Out','PWM','RCOU',[11,12,13]};
+
 plots{16}= {'Control_outputs','Control out','Control outputs','','AETR',[3,4,5,6,7]};
-plots{17}= {'Quadplane_PID','Quadplane PID','Quadplane Pitch PID','','PIQP',[4,5,6]};
-plots{18}= {'Quadplane_PID','Quadplane PID','Quadplane Roll PID','','PIQR',[4,5,6]};
-plots{19}= {'Quadplane_PID','Quadplane PID','Quadplane Yaw PID','','PIQY',[4,5,6]};
+%plots{16}= {'Control_outputs','Control out','Control outputs','','AETR',[5]};
+
+plots{17}= {'Quadplane_PID','Quadplane PID','Quadplane Pitch PID','','PIQP',[5,6,7,8]};
+plots{18}= {'Quadplane_PID','Quadplane PID','Quadplane Roll PID','','PIQR',[5,6,7,8]};
+plots{19}= {'Quadplane_PID','Quadplane PID','Quadplane Yaw PID','','PIQY',[5,6,7,8]};
 plots{20}= {'AoA','Angle of Attack','Angle of Attack','AoA (deg)','AOA',3};
 plots{21}= {'Nav','Navigation','Navigation','','NTUN',6};
 plots{22}= {'Bat','Battery','Battery Volts','Voltage','BAT',4};
@@ -47,8 +54,10 @@ plots{27}= {'ESC_Log','ESC Log','ESC RPM','RPM','ESC1',3,'ESC2',3,'ESC3',3,'ESC4
 plots{28}= {'ESC_Log','ESC Log','ESC Voltage','Voltage','ESC1',4,'ESC2',4,'ESC3',4,'ESC4',4,'ESC5',4,'ESC6',4,'ESC7',4,'ESC8',4};
 plots{29}= {'ESC_Log','ESC Log','ESC Current','Current (A)','ESC1',5,'ESC2',5,'ESC3',5,'ESC4',5,'ESC5',5,'ESC6',5,'ESC7',5,'ESC8',5};
 plots{30}= {'ESC_Log','ESC Log','ESC Tmep','Temp (deg C)','ESC1',6,'ESC2',6,'ESC3',6,'ESC4',6,'ESC5',6,'ESC6',6,'ESC7',6,'ESC8',6};
-plots{31}= {'RC_contorl_in','Control in2','Control inputst','RCIN','RCIN',[3,4,5,6,7,8,9,10,11,12,13,14,15,16]};
-
+plots{31}= {'RC_contorl_in','Control in2','Control inputs','RCIN','RCIN',[3,4,5,6,7,8,9,10,11,12,13,14,15,16]};
+plots{32}= {'RC_contorl_in','Control in2','Control inputs','RCIN','RCIN',[5]};
+plots{33}= {'GPS','GPS','GPS Speed','Speed m/s','GPS',[11]};
+plots{34}= {'EKF_wind','EKF wind','EKF wind Speed','Speed m/s','NKF2',[7,8]};
 
 % Defualts
 file_name = 'Input File Name';
@@ -365,12 +374,12 @@ errors_sub{1+2,12} = 'GLITCH';
 if ~strcmp(ERR,'false')
     error_time = zeros(1,length(ERR.value));
     error_print = cell(1,length(ERR.value));
-    for n = 1:length(ERR.value)
+    for n = 1:size(ERR.value,1)
         error_time(n) = ERR.value(n,2)/1e6;
         message = errors(ERR.value(n,3));
         index = sub_code(ERR.value(n,3));
         index2 = ERR.value(n,4) + 1;
-        if isnan(index) || isempty(errors_sub{index,index2})
+        if isnan(index) || index > size(errors_sub,1) || isempty(errors_sub{index,index2})
             index = 1;
         end
         mesage_2 = errors_sub(index,index2);
@@ -580,9 +589,9 @@ vehicle = getappdata(0,'vehicle');
 handles = getappdata(0,'handles');
 
 if strcmp(vehicle,'Copter')
-    MODELOOKUP = {'Stabilize','Acro','AltHold','Auto','Guided','Loiter','RTL','Circle','Land','Drift','Sport','Flip','AutoTune','PosHold','Brake','Throw','Avoid_ADSB','Guided_NoGPS','Smart_RTL','FlowHold','Follow'};
+    MODELOOKUP = {'Stabilize','Acro','AltHold','Auto','Guided','Loiter','RTL','Circle','Land','Drift','Sport','Flip','AutoTune','PosHold','Brake','Throw','Avoid ADSB','Guided_NoGPS','Smart RTL','FlowHold','Follow'};
 elseif strcmp(vehicle,'Plane')
-    MODELOOKUP = {'Manual','CIRCLE','STABILIZE','TRAINING','ACRO','FBWA','FBWB','CRUISE','AUTOTUNE','','Auto','RTL','Loiter','','AVOID_ADSB','Guided','','QSTABILIZE','QHOVER','QLOITER','QLAND','QRTL'};
+    MODELOOKUP = {'Manual','CIRCLE','STABILIZE','TRAINING','ACRO','FBWA','FBWB','CRUISE','AUTOTUNE','','Auto','RTL','Loiter','','AVOID_ADSB','Guided','','QSTABILIZE','QHOVER','QLOITER','QLAND','QRTL','','QACRO'};
 elseif  strcmp(vehicle,'Rover')
     MODELOOKUP = {'Not Done this yet'};
 elseif  strcmp(vehicle,'AntennaTracker')
@@ -599,11 +608,10 @@ fig_handle.Position = position;
 ax = axes;
 hold all
 
-legend_val = {};
-
 Min_max_x = [inf,-inf];
 Min_max_y = [inf,-inf];
 
+legend_val = cell((length(varargin)/2),1);
 for n = 1:(length(varargin)/2)
     var{1} = varargin{(n*2)-1}.value;
     var{2} = varargin{(n*2)-1}.label;
@@ -611,13 +619,13 @@ for n = 1:(length(varargin)/2)
 
     var_index = varargin{(n*2)};
     
-    legend_val = cell(length(var_index),1);
+    legend_val{n} = cell(length(var_index),1);
     for m = 1:length(var_index)
         if sign(var_index(m)) == 1
             
             plot(ax,var{1}(:,2)/1e6,var{1}(:,var_index(m)),colour(var_index(m) + n - 1))
             
-            legend_val(m) = strcat(var{3},{' - '},var{2}(var_index(m)));
+            legend_val{n}(m) = strcat(var{3},{' - '},var{2}(var_index(m)));
             
             Min_max_x = [min([Min_max_x(1),min(var{1}(:,2)/1e6)]),max([Min_max_x(2),max(var{1}(:,2)/1e6)])];
             Min_max_y = [min([Min_max_y(1),min(var{1}(:,var_index(m)))]),max([Min_max_y(2),max(var{1}(:,var_index(m)))])];
@@ -626,7 +634,7 @@ for n = 1:(length(varargin)/2)
             
             plot(ax,var{1}(:,2)/1e6,-1 * var{1}(:,var_index(m)),colour(m))
             
-            legend_val(m) = strcat(var{3},{' - '},{'NEGATIVE '},var{2}(var_index(m)));
+            legend_val{n}(m) = strcat(var{3},{' - '},{'NEGATIVE '},var{2}(var_index(m)));
             
             Min_max_x = [min([Min_max_x(1),min(var{1}(:,2)/1e6)]),max([Min_max_x(2),max(var{1}(:,2)/1e6)])];
             Min_max_y = [min([Min_max_y(1),-1*max(var{1}(:,var_index(m)))]),max([Min_max_y(2),-1*min(var{1}(:,var_index(m)))])];
@@ -634,12 +642,12 @@ for n = 1:(length(varargin)/2)
         
         if any(isnan(var{1}(:,var_index(m))))
             if min(isnan(var{1}(:,var_index(m))))
-                legend_val(m) = strcat(legend_val(m),'\color{red} Completely NAN!');
+                legend_val{n}(m) = strcat(legend_val{n}(m),'\color{red} Completely NAN!');
             else
-                legend_val(m) = strcat(legend_val(m),'\color{red} Contains NAN!');
+                legend_val{n}(m) = strcat(legend_val{n}(m),'\color{red} Contains NAN!');
             end
         elseif all((var{1}(:,var_index(m))) == 0)
-            legend_val(m) = strcat(legend_val(m),'\color{red} all zero!');
+            legend_val{n}(m) = strcat(legend_val{n}(m),'\color{red} all zero!');
         end
         
         
@@ -680,12 +688,20 @@ if handles.time_crop.Value == 1 && isappdata(0,'time_crop')
     Min_max_x = TimeCrop;
 end
 
+i = 0;
+for n = 1:numel(legend_val)
+    for m = 1:numel(legend_val{n})
+        i = i + 1;
+        legend_val_1{i,1} = legend_val{n}{m}; %#ok<AGROW>
+    end
+end
+
 xlim(ax,Min_max_x)
 ylim(ax,Min_max_y)
 xlabel(ax,'Time (s)')
 ylabel(ax,Label)
 title(ax,Title)
-legend(ax,legend_val,'Location','northeastoutside');
+legend(ax,legend_val_1,'Location','northeastoutside');
 
 %--- Mode Switch Markers ---
 if handles.mode_shadeing.Value == 1

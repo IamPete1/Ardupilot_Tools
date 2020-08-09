@@ -408,7 +408,7 @@ else
             time = MSG1.value{1,n}{2}/1e6;
             
             if exist('error_time','var')
-                while time > error_time(i)
+                while i <= numel(error_time) && time > error_time(i)
                     if  exist('cprintf','file') == 2
                         cprintf('red','%s',error_print{i})
                     else
